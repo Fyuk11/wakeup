@@ -17,11 +17,11 @@ function EnergyRing({ mode, isMobile }) {
   if (mode === 'normal') return null;
 
   const color = mode === 'cyber' ? '#ff00aa' : '#00f5a0';
-  const ringPosition = isMobile ? [0, 0, -0.5] : [1.2, 0, -0.5];
+  const ringPosition = isMobile ? [0, 0.4, -0.5] : [1.2, 0, -0.5];
 
   return (
     <mesh ref={ringRef} position={ringPosition}>
-      <torusGeometry args={[isMobile ? 1.5 : 2.2, 0.025, 16, 100]} />
+      <torusGeometry args={[isMobile ? 1.8 : 2.2, 0.025, 16, 100]} />
       <meshBasicMaterial color={color} transparent opacity={0.7} wireframe />
     </mesh>
   );
@@ -76,9 +76,10 @@ function ModelEye({ mode, isMobile }) {
 
   const currentColors = lightColors[mode] || lightColors.normal;
 
-  // En móvil lo centramos y ajustamos escala más pequeña
-  const groupPosition = isMobile ? [0, 0.2, 0] : [1.2, 0, 0];
-  const modelScale = isMobile ? 0.028 : 0.045; 
+  // AJUSTADO: Posición ligeramente elevada en mobile para liberar el centro-inferior
+  // y escala intermedia para mantener la presencia visual.
+  const groupPosition = isMobile ? [0, 0.4, 0] : [1.2, 0, 0];
+  const modelScale = isMobile ? 0.036 : 0.045; 
 
   return (
     <group position={groupPosition}>
@@ -199,8 +200,8 @@ export default function EyeCanvas3D() {
 
       {/* --- CANVAS 3D --- */}
       <div className="relative z-10 w-full h-full">
-        {/* Posición Z alejada a 11.5 en mobile para dar profundidad */}
-        <Canvas camera={{ position: [0, 0, isMobile ? 11.5 : 8], fov: 45 }}>
+        {/* AJUSTADO: Cámara z: 9.2 para recortar la distancia excesiva */}
+        <Canvas camera={{ position: [0, 0, isMobile ? 9.2 : 8], fov: 45 }}>
           <Stars 
             radius={50} 
             depth={50} 
