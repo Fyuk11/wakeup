@@ -45,6 +45,11 @@ export default function LuminousTransition() {
     ['blur(0px)', 'blur(10px)']
   );
 
+  // Mensaje predeterminado codificado para la URL
+  const whatsappUrl = `https://wa.me/5491179044538?text=${encodeURIComponent(
+    '¡Hola! Me interesa iniciar un proyecto con ustedes.'
+  )}`;
+
   return (
     <motion.div
       ref={containerRef}
@@ -111,14 +116,18 @@ export default function LuminousTransition() {
             Fusionamos estética futurista, 3D en tiempo real y código de alta precisión para marcas que no temen destacar.
           </p>
 
-          <motion.button
+          {/* Botón adaptado a enlace directo de WhatsApp */}
+          <motion.a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-2 sm:mt-4 px-8 py-3.5 sm:px-10 sm:py-5 rounded-full bg-black text-white font-mono font-bold text-[11px] sm:text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-2xl flex items-center gap-3 group cursor-pointer"
+            className="mt-2 sm:mt-4 px-8 py-3.5 sm:px-10 sm:py-5 rounded-full bg-black text-white font-mono font-bold text-[11px] sm:text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-2xl flex items-center gap-3 group cursor-pointer inline-flex"
           >
             <span>INICIAR PROYECTO</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>
-          </motion.button>
+          </motion.a>
         </motion.div>
 
       </div>
