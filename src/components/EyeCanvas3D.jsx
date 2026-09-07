@@ -16,12 +16,12 @@ function EnergyRing({ mode, isMobile }) {
 
   if (mode === 'normal') return null;
 
-  const color = mode === 'cyber' ? '#ff00aa' : '#00f5a0'; // Verde esmeralda cristalino
+  const color = mode === 'cyber' ? '#ff00aa' : '#00f5a0';
   const ringPosition = isMobile ? [0, 0, -0.5] : [1.2, 0, -0.5];
 
   return (
     <mesh ref={ringRef} position={ringPosition}>
-      <torusGeometry args={[isMobile ? 1.8 : 2.2, 0.025, 16, 100]} />
+      <torusGeometry args={[isMobile ? 1.5 : 2.2, 0.025, 16, 100]} />
       <meshBasicMaterial color={color} transparent opacity={0.7} wireframe />
     </mesh>
   );
@@ -40,10 +40,13 @@ function ModelEye({ mode, isMobile }) {
     const pointerY = state.pointer?.y ?? 0;
     const time = state.clock.getElapsedTime();
 
-    // Ajuste mobile: Aplicamos un sesgo (-1.8 en X) y reducimos el multiplicador
-    // para que en móviles la mirada apunte más a la izquierda y no se desborde al tocar el lado derecho
-    const targetX = isMobile ? (pointerX * 1.5) - 1.8 : pointerX * 3;
-    const targetY = pointerY * 3;
+    // Movimiento fluido orgánico sin sesgos raros
+    let rawTargetX = pointerX * (isMobile ? 2.2 : 3);
+    let rawTargetY = pointerY * (isMobile ? 2.2 : 3);
+
+    // Limitamos el rango de seguimiento para que la mirada sea natural y no rompa el ángulo
+    const targetX = Math.max(-2.5, Math.min(2.5, rawTargetX));
+    const targetY = Math.max(-2.0, Math.min(2.0, rawTargetY));
     const targetZ = 8; 
 
     targetRef.current.x = THREE.MathUtils.lerp(targetRef.current.x, targetX, 0.08);
@@ -65,7 +68,6 @@ function ModelEye({ mode, isMobile }) {
     }
   });
 
-  // Tono Esmeralda Cristalino para X-Ray/Matrix
   const lightColors = {
     normal: { main: '#ffffff', accent: '#00e5ff' },
     cyber: { main: '#ff00aa', accent: '#a855f7' },
@@ -74,15 +76,16 @@ function ModelEye({ mode, isMobile }) {
 
   const currentColors = lightColors[mode] || lightColors.normal;
 
-  // Posición del modelo: Centrado en mobile, desplazado a la derecha en desktop
-  const groupPosition = isMobile ? [0, 0, 0] : [1.2, 0, 0];
+  // En móvil lo centramos y ajustamos escala más pequeña
+  const groupPosition = isMobile ? [0, 0.2, 0] : [1.2, 0, 0];
+  const modelScale = isMobile ? 0.028 : 0.045; 
 
   return (
     <group position={groupPosition}>
       <Float speed={mode === 'cyber' ? 2.5 : 1.8} rotationIntensity={0.08} floatIntensity={0.3}>
         <group ref={eyeRef}>
           <Center>
-            <primitive object={clonedScene} scale={isMobile ? 0.038 : 0.045} />
+            <primitive object={clonedScene} scale={modelScale} />
           </Center>
         </group>
 
@@ -119,7 +122,7 @@ export default function EyeCanvas3D() {
   const galaxyConfig = {
     normal: { sparkleColor: '#00e5ff', count: 140, speed: 0.6 },
     cyber: { sparkleColor: '#ff00aa', count: 450, speed: 2.0 },
-    xray: { sparkleColor: '#00f5a0', count: 380, speed: 2.2 } // Partículas esmeralda menta
+    xray: { sparkleColor: '#00f5a0', count: 380, speed: 2.2 }
   };
 
   const activeGalaxy = galaxyConfig[visionMode];
@@ -146,7 +149,6 @@ export default function EyeCanvas3D() {
 
       {/* --- FONDO DE AMBIENTE ESMERALDA GLASSMORPHIC --- */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        
         <img 
           src="https://images.pexels.com/photos/18833053/pexels-photo-18833053.jpeg?auto=compress&cs=tinysrgb&w=1920" 
           alt="Galaxy Background" 
@@ -157,18 +159,12 @@ export default function EyeCanvas3D() {
           }`}
         />
 
-        {/* GRADIENTE CYBER */}
         <div className={`absolute inset-0 transition-opacity duration-700 ${visionMode === 'cyber' ? 'opacity-100' : 'opacity-0'}`}>
           <div className="absolute top-1/2 right-[15%] -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-[radial-gradient(circle,_rgba(255,0,170,0.45)_0%,_rgba(168,85,247,0.3)_40%,_transparent_70%)] blur-[90px] animate-cyber-glow" />
         </div>
 
-        {/* GRADIENTE ESMERALDA CRISTALINO (Glassmorphing effect) */}
         <div className={`absolute inset-0 transition-opacity duration-700 ${visionMode === 'xray' ? 'opacity-100' : 'opacity-0'}`}>
-          
-          {/* Capa de fondo verde esmeralda translúcido */}
           <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[680px] h-[680px] rounded-full bg-[radial-gradient(circle,_rgba(0,245,160,0.35)_0%,_rgba(0,184,148,0.2)_40%,_rgba(10,50,40,0.1)_70%,_transparent_100%)] blur-[80px] backdrop-blur-3xl animate-emerald-glass" />
-          
-          {/* Destello cristalino cian/menta reflectante */}
           <div className="absolute top-1/3 right-[18%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(0,210,255,0.25)_0%,_transparent_65%)] blur-[60px]" />
         </div>
 
@@ -176,7 +172,7 @@ export default function EyeCanvas3D() {
       </div>
 
       {/* --- BOTONES DE INTERFAZ --- */}
-      <div className="absolute top-20 right-10 z-30 flex flex-col gap-2 items-end">
+      <div className="absolute top-20 right-5 sm:right-10 z-30 flex flex-col gap-2 items-end">
         <span className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase mb-1">
           // MODOS DE ENFOQUE
         </span>
@@ -203,7 +199,8 @@ export default function EyeCanvas3D() {
 
       {/* --- CANVAS 3D --- */}
       <div className="relative z-10 w-full h-full">
-        <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+        {/* Posición Z alejada a 11.5 en mobile para dar profundidad */}
+        <Canvas camera={{ position: [0, 0, isMobile ? 11.5 : 8], fov: 45 }}>
           <Stars 
             radius={50} 
             depth={50} 
