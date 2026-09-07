@@ -1,10 +1,10 @@
-import { useRef, Suspense, useMemo, useState } from 'react';
+import { useRef, Suspense, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Float, Sparkles, Center, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Anillo orbital con aspecto de cristal esmeralda
-function EnergyRing({ mode }) {
+function EnergyRing({ mode, isMobile }) {
   const ringRef = useRef();
 
   useFrame((state, delta) => {
@@ -17,16 +17,17 @@ function EnergyRing({ mode }) {
   if (mode === 'normal') return null;
 
   const color = mode === 'cyber' ? '#ff00aa' : '#00f5a0'; // Verde esmeralda cristalino
+  const ringPosition = isMobile ? [0, 0, -0.5] : [1.2, 0, -0.5];
 
   return (
-    <mesh ref={ringRef} position={[1.2, 0, -0.5]}>
-      <torusGeometry args={[2.2, 0.025, 16, 100]} />
+    <mesh ref={ringRef} position={ringPosition}>
+      <torusGeometry args={[isMobile ? 1.8 : 2.2, 0.025, 16, 100]} />
       <meshBasicMaterial color={color} transparent opacity={0.7} wireframe />
     </mesh>
   );
 }
 
-function ModelEye({ mode }) {
+function ModelEye({ mode, isMobile }) {
   const eyeRef = useRef();
   const pointLightRef = useRef();
   const targetRef = useRef(new THREE.Vector3(0, 0, 10)); 
@@ -39,7 +40,9 @@ function ModelEye({ mode }) {
     const pointerY = state.pointer?.y ?? 0;
     const time = state.clock.getElapsedTime();
 
-    const targetX = pointerX * 3;
+    // Ajuste mobile: Aplicamos un sesgo (-1.8 en X) y reducimos el multiplicador
+    // para que en móviles la mirada apunte más a la izquierda y no se desborde al tocar el lado derecho
+    const targetX = isMobile ? (pointerX * 1.5) - 1.8 : pointerX * 3;
     const targetY = pointerY * 3;
     const targetZ = 8; 
 
@@ -71,12 +74,15 @@ function ModelEye({ mode }) {
 
   const currentColors = lightColors[mode] || lightColors.normal;
 
+  // Posición del modelo: Centrado en mobile, desplazado a la derecha en desktop
+  const groupPosition = isMobile ? [0, 0, 0] : [1.2, 0, 0];
+
   return (
-    <group position={[1.2, 0, 0]}>
+    <group position={groupPosition}>
       <Float speed={mode === 'cyber' ? 2.5 : 1.8} rotationIntensity={0.08} floatIntensity={0.3}>
         <group ref={eyeRef}>
           <Center>
-            <primitive object={clonedScene} scale={0.045} />
+            <primitive object={clonedScene} scale={isMobile ? 0.038 : 0.045} />
           </Center>
         </group>
 
@@ -101,6 +107,14 @@ useGLTF.preload('/models/eye.glb');
 
 export default function EyeCanvas3D() {
   const [visionMode, setVisionMode] = useState('normal');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const galaxyConfig = {
     normal: { sparkleColor: '#00e5ff', count: 140, speed: 0.6 },
@@ -208,10 +222,10 @@ export default function EyeCanvas3D() {
             color={activeGalaxy.sparkleColor} 
           />
           
-          <EnergyRing mode={visionMode} />
+          <EnergyRing mode={visionMode} isMobile={isMobile} />
 
           <Suspense fallback={null}>
-            <ModelEye mode={visionMode} />
+            <ModelEye mode={visionMode} isMobile={isMobile} />
           </Suspense>
         </Canvas>
       </div>
