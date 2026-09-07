@@ -9,7 +9,6 @@ export default function LuminousTransition() {
     offset: ['start start', 'end end']
   });
 
-  // Transición de fondo: Negro -> Blanco Absoluto -> Tono neutro claro de salida
   const backgroundColor = useTransform(
     scrollYProgress,
     [0, 0.2, 0.85, 1],
@@ -22,16 +21,12 @@ export default function LuminousTransition() {
     ['#ffffff', '#000000']
   );
 
-  // Revelado de la textura del ojo
   const eyeImageOpacity = useTransform(scrollYProgress, [0, 0.25, 0.5], [0.15, 0.35, 0]);
   const eyeScale = useTransform(scrollYProgress, [0, 0.5], [0.95, 1.2]);
 
-  // Indicador "DESLIZÁ PARA DESPERTAR" arriba como encabezado inicial
   const headerGuideOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
   const headerGuideY = useTransform(scrollYProgress, [0, 0.25], [0, -20]);
 
-  // Entrada y Salida del CTA (Efecto Parpadeo/Respiración hacia atrás)
-  // [Entrada (0->0.3) | Permanencia fija (0.3->0.75) | Respiración/Salida hacia atrás (0.75->1)]
   const ctaOpacity = useTransform(
     scrollYProgress,
     [0.15, 0.3, 0.75, 0.88, 1],
@@ -41,30 +36,30 @@ export default function LuminousTransition() {
   const ctaScale = useTransform(
     scrollYProgress,
     [0.15, 0.3, 0.75, 0.95],
-    [0.9, 1, 1, 0.82] // Zoom-out progresivo imitando un alejamiento visual
+    [0.9, 1, 1, 0.82]
   );
 
   const ctaBlur = useTransform(
     scrollYProgress,
     [0.75, 0.95],
-    ['blur(0px)', 'blur(10px)'] // Desenfoque progresivo de lente al alejarse
+    ['blur(0px)', 'blur(10px)']
   );
 
   return (
     <motion.div
       ref={containerRef}
       style={{ backgroundColor }}
-      className="relative w-full h-[320vh] transition-colors duration-150 ease-out"
+      className="relative w-full h-[280vh] sm:h-[320vh] transition-colors duration-150 ease-out"
     >
-      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden px-6">
+      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6">
         
-        {/* ENCABEZADO SUPERIOR: Guía inmediata para el usuario */}
+        {/* Indicador de Desplazamiento */}
         <motion.div
           style={{ opacity: headerGuideOpacity, y: headerGuideY }}
-          className="absolute top-12 z-30 flex flex-col items-center gap-2 pointer-events-none"
+          className="absolute top-8 sm:top-12 z-30 flex flex-col items-center gap-2 pointer-events-none"
         >
-          <span className="text-xs font-mono uppercase tracking-[0.4em] text-cyan-400 font-bold drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]">
-            // DESLIZÁ PARA DESPERTAR
+          <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] text-cyan-400 font-bold drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]">
+            DESLIZÁ PARA DESPERTAR
           </span>
           <motion.div
             animate={{ y: [0, 6, 0] }}
@@ -73,7 +68,7 @@ export default function LuminousTransition() {
           />
         </motion.div>
 
-        {/* Fondo Narrativo: Textura del Ojo */}
+        {/* Imagen de Fondo Ojo */}
         <motion.div
           style={{ opacity: eyeImageOpacity, scale: eyeScale }}
           className="absolute inset-0 pointer-events-none flex items-center justify-center z-0 mix-blend-multiply"
@@ -85,16 +80,16 @@ export default function LuminousTransition() {
           />
         </motion.div>
 
-        {/* Círculo Inmersivo de Luz y Ondas */}
+        {/* Círculo de Luz Responsivo */}
         <motion.div
           style={{
-            scale: useTransform(scrollYProgress, [0, 0.4, 0.8], [0.4, 2.8, 3.2]),
+            scale: useTransform(scrollYProgress, [0, 0.4, 0.8], [0.4, 2.5, 3]),
             opacity: useTransform(scrollYProgress, [0, 0.2, 0.75, 0.95], [0.2, 1, 1, 0])
           }}
-          className="absolute w-[750px] h-[750px] rounded-full bg-gradient-to-tr from-cyan-300 via-white to-emerald-200 blur-3xl pointer-events-none z-0"
+          className="absolute w-[320px] sm:w-[750px] h-[320px] sm:h-[750px] rounded-full bg-gradient-to-tr from-cyan-300 via-white to-emerald-200 blur-2xl sm:blur-3xl pointer-events-none z-0"
         />
 
-        {/* CTA Principal Inmersivo con efecto Respiración / Parpadeo de salida */}
+        {/* Bloque CTA Central */}
         <motion.div
           style={{
             scale: ctaScale,
@@ -102,24 +97,24 @@ export default function LuminousTransition() {
             filter: ctaBlur,
             color: textColor
           }}
-          className="relative z-10 max-w-4xl text-center flex flex-col items-center gap-6"
+          className="relative z-10 max-w-4xl text-center flex flex-col items-center gap-4 sm:gap-6 px-2"
         >
-          <span className="text-xs font-mono uppercase tracking-[0.5em] px-4 py-1.5 rounded-full border border-black/10 bg-black/5 backdrop-blur-md">
-            // WAKE UP EXPERIENCE
+          <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.3em] px-3 py-1 sm:px-4 sm:py-1.5 rounded-full border border-black/10 bg-black/5 backdrop-blur-md">
+            WAKE UP EXPERIENCE
           </span>
 
-          <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tight leading-[1.05]">
+          <h2 className="text-2xl sm:text-6xl font-black uppercase tracking-tight leading-tight sm:leading-[1.05]">
             ¿Listo para despertar el potencial de tu <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-emerald-600">visión digital</span>?
           </h2>
 
-          <p className="text-base md:text-xl font-mono opacity-80 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-lg font-mono opacity-80 max-w-xl leading-relaxed">
             Fusionamos estética futurista, 3D en tiempo real y código de alta precisión para marcas que no temen destacar.
           </p>
 
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-4 px-10 py-5 rounded-full bg-black text-white font-mono font-bold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-2xl flex items-center gap-3 group cursor-pointer"
+            className="mt-2 sm:mt-4 px-8 py-3.5 sm:px-10 sm:py-5 rounded-full bg-black text-white font-mono font-bold text-[11px] sm:text-xs tracking-widest uppercase hover:bg-neutral-800 transition-all shadow-2xl flex items-center gap-3 group cursor-pointer"
           >
             <span>INICIAR PROYECTO</span>
             <span className="group-hover:translate-x-1 transition-transform">→</span>

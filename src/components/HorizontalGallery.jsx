@@ -54,8 +54,8 @@ export default function HorizontalGallery() {
     const el = sectionRef.current;
     if (!el) return;
 
-    // Cálculo dinámico según el ancho total de los elementos
-    const getScrollAmount = () => -(el.scrollWidth - window.innerWidth + 100);
+    // Cálculo dinámico contemplando padding lateral
+    const getScrollAmount = () => -(el.scrollWidth - window.innerWidth + (window.innerWidth < 768 ? 32 : 100));
 
     const pin = gsap.to(el, {
       x: getScrollAmount,
@@ -64,7 +64,7 @@ export default function HorizontalGallery() {
         trigger: triggerRef.current,
         start: 'top top',
         end: () => `+=${el.scrollWidth}`,
-        scrub: 0.8,
+        scrub: 0.6, // Scrub un poco más directo para mejor respuesta táctil
         pin: true,
         invalidateOnRefresh: true,
         anticipatePin: 1
@@ -79,22 +79,25 @@ export default function HorizontalGallery() {
       <div className="h-screen w-full flex items-center justify-start relative">
         
         {/* Titular Fijo Superior */}
-        <div className="absolute top-10 left-10 md:left-16 z-20 pointer-events-none">
-          <span className="text-xs font-mono uppercase tracking-[0.4em] text-cyan-400 block mb-1">
-            // ARCHIVO VISUAL
+        <div className="absolute top-6 left-6 md:top-10 md:left-16 z-20 pointer-events-none">
+          <span className="text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] text-cyan-400 block mb-0.5 md:mb-1">
+            ARCHIVO VISUAL
           </span>
-          <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight">
+          <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight">
             GALERÍA DE EXPERIENCIAS
           </h2>
         </div>
 
         {/* Carrusel Desplazable Horizontalmente */}
-        <div ref={sectionRef} className="flex gap-8 md:gap-12 pl-10 md:pl-16 pr-32 w-max items-center">
+        <div 
+          ref={sectionRef} 
+          className="flex gap-4 md:gap-12 pl-6 md:pl-16 pr-12 md:pr-32 w-max items-center pt-12 md:pt-0"
+        >
           {PROJECTS.map((project) => (
             <div
               key={project.id}
               onClick={() => setSelectedProject(project)}
-              className="group relative w-[320px] sm:w-[460px] h-[480px] sm:h-[560px] bg-neutral-900/60 rounded-3xl border border-white/10 overflow-hidden flex flex-col justify-between p-8 hover:border-cyan-500/50 transition-all duration-500 shrink-0 shadow-2xl cursor-pointer backdrop-blur-md"
+              className="group relative w-[280px] sm:w-[420px] md:w-[460px] h-[420px] sm:h-[500px] md:h-[560px] bg-neutral-900/60 rounded-3xl border border-white/10 overflow-hidden flex flex-col justify-between p-6 md:p-8 hover:border-cyan-500/50 transition-all duration-500 shrink-0 shadow-2xl cursor-pointer backdrop-blur-md"
             >
               {/* Imagen de fondo con hover zoom */}
               <div className="absolute inset-0 z-0 overflow-hidden">
@@ -108,29 +111,29 @@ export default function HorizontalGallery() {
 
               {/* Tag Superior */}
               <div className="relative z-10 flex justify-between items-center">
-                <span className="text-2xl font-mono font-black text-cyan-400">
+                <span className="text-xl md:text-2xl font-mono font-black text-cyan-400">
                   {project.id}
                 </span>
-                <span className="text-[10px] font-mono tracking-widest px-3 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 uppercase">
+                <span className="text-[9px] md:text-[10px] font-mono tracking-widest px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full border border-white/10 uppercase">
                   {project.category}
                 </span>
               </div>
 
               {/* Info Inferior */}
               <div className="relative z-10">
-                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4 group-hover:text-cyan-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight mb-3 md:mb-4 group-hover:text-cyan-300 transition-colors">
                   {project.title}
                 </h3>
                 
-                <div className="flex gap-2 flex-wrap mb-4">
+                <div className="flex gap-1.5 md:gap-2 flex-wrap mb-3 md:mb-4">
                   {project.tags.map((tag, i) => (
-                    <span key={i} className="text-[9px] font-mono px-2.5 py-1 bg-white/10 backdrop-blur-md rounded-md text-neutral-300">
+                    <span key={i} className="text-[8px] md:text-[9px] font-mono px-2 md:px-2.5 py-0.5 md:py-1 bg-white/10 backdrop-blur-md rounded-md text-neutral-300">
                       #{tag}
                     </span>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="flex items-center gap-2 text-[11px] md:text-xs font-mono text-cyan-400 opacity-90 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span>DESPLEGAR CONCEPTO</span>
                   <span>→</span>
                 </div>
@@ -163,13 +166,13 @@ export default function HorizontalGallery() {
               {/* Botón Cierre */}
               <button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors font-mono"
+                className="absolute top-4 right-4 z-20 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors font-mono text-sm"
               >
                 ✕
               </button>
 
               {/* Imagen Grande */}
-              <div className="md:w-1/2 relative h-[250px] md:h-auto">
+              <div className="md:w-1/2 relative h-[200px] md:h-auto">
                 <img
                   src={selectedProject.img}
                   alt={selectedProject.title}
@@ -179,23 +182,23 @@ export default function HorizontalGallery() {
               </div>
 
               {/* Detalles */}
-              <div className="md:w-1/2 p-8 flex flex-col justify-between gap-6">
+              <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-between gap-4 md:gap-6">
                 <div>
-                  <span className="text-xs font-mono text-cyan-400 tracking-widest uppercase block mb-1">
-                    // {selectedProject.category}
+                  <span className="text-[10px] md:text-xs font-mono text-cyan-400 tracking-widest uppercase block mb-1">
+                    {selectedProject.category}
                   </span>
-                  <h2 className="text-3xl font-extrabold text-white mb-4">
+                  <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 md:mb-4">
                     {selectedProject.title}
                   </h2>
-                  <p className="text-neutral-300 text-sm leading-relaxed mb-6 font-mono">
+                  <p className="text-neutral-300 text-xs md:text-sm leading-relaxed mb-4 md:mb-6 font-mono">
                     {selectedProject.description}
                   </p>
 
-                  <div className="bg-black/60 border border-white/10 rounded-xl p-4 mb-4">
-                    <span className="text-[10px] font-mono text-neutral-400 uppercase block mb-1">
+                  <div className="bg-black/60 border border-white/10 rounded-xl p-3 md:p-4 mb-2 md:mb-4">
+                    <span className="text-[9px] md:text-[10px] font-mono text-neutral-400 uppercase block mb-1">
                       PROMPT GENERATIVO:
                     </span>
-                    <p className="text-xs font-mono text-cyan-300/90 italic">
+                    <p className="text-[11px] md:text-xs font-mono text-cyan-300/90 italic">
                       "{selectedProject.prompt}"
                     </p>
                   </div>
