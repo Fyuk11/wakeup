@@ -121,7 +121,7 @@ export default function ExperienceFooter() {
               whileTap={{ scale: 0.95 }}
               className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 font-bold tracking-widest uppercase hover:bg-cyan-500/20 hover:border-cyan-400 transition-all cursor-pointer group shadow-[0_0_12px_rgba(34,211,238,0.15)]"
             >
-              <span>ARRIBA</span>
+              <span>VOLVER ARRIBA</span>
               <span className="group-hover:-translate-y-0.5 transition-transform">↑</span>
             </motion.button>
           </div>
