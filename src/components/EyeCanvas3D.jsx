@@ -89,8 +89,8 @@ function ModelEye({ mode, isMobile }) {
         </group>
 
         {/* Iluminación atenuada en modo xray para evitar quemar el contorno */}
-        <ambientLight intensity={mode === 'xray' ? 0.8 : 2} />
-        <directionalLight position={[0, 5, 10]} intensity={mode === 'xray' ? 2.2 : 3.8} color={currentColors.main} />
+        <ambientLight intensity={mode === 'xray' ? 0.2 : 2} />
+        <directionalLight position={[0, 5, 10]} intensity={mode === 'xray' ? 1.2 : 3.8} color={currentColors.main} />
         
         <pointLight 
           ref={pointLightRef}
