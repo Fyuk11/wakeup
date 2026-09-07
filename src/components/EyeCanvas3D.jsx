@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Float, Sparkles, Center, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Anillo orbital con aspecto de cristal esmeralda
+// Anillo orbital con aspecto translúcido sutil
 function EnergyRing({ mode, isMobile }) {
   const ringRef = useRef();
 
@@ -21,8 +21,9 @@ function EnergyRing({ mode, isMobile }) {
 
   return (
     <mesh ref={ringRef} position={ringPosition}>
-      <torusGeometry args={[isMobile ? 1.8 : 2.2, 0.025, 16, 100]} />
-      <meshBasicMaterial color={color} transparent opacity={0.7} wireframe />
+      <torusGeometry args={[isMobile ? 1.8 : 2.2, 0.02, 16, 100]} />
+      {/* Opacidad reducida para eliminar el bloque sólido */}
+      <meshBasicMaterial color={color} transparent opacity={0.35} wireframe />
     </mesh>
   );
 }
@@ -40,11 +41,9 @@ function ModelEye({ mode, isMobile }) {
     const pointerY = state.pointer?.y ?? 0;
     const time = state.clock.getElapsedTime();
 
-    // Movimiento fluido orgánico sin sesgos raros
     let rawTargetX = pointerX * (isMobile ? 2.2 : 3);
     let rawTargetY = pointerY * (isMobile ? 2.2 : 3);
 
-    // Limitamos el rango de seguimiento para que la mirada sea natural y no rompa el ángulo
     const targetX = Math.max(-2.5, Math.min(2.5, rawTargetX));
     const targetY = Math.max(-2.0, Math.min(2.0, rawTargetY));
     const targetZ = 8; 
@@ -59,9 +58,10 @@ function ModelEye({ mode, isMobile }) {
 
     if (pointLightRef.current) {
       if (mode === 'cyber') {
-        pointLightRef.current.intensity = 8 + Math.sin(time * 8) * 4;
+        pointLightRef.current.intensity = 6 + Math.sin(time * 8) * 3;
       } else if (mode === 'xray') {
-        pointLightRef.current.intensity = 7 + Math.cos(time * 8) * 3;
+        // Reducido el destello agresivo para no iluminar en exceso la masa trasera
+        pointLightRef.current.intensity = 3.5 + Math.cos(time * 6) * 1.5;
       } else {
         pointLightRef.current.intensity = 2;
       }
@@ -76,8 +76,6 @@ function ModelEye({ mode, isMobile }) {
 
   const currentColors = lightColors[mode] || lightColors.normal;
 
-  // AJUSTADO: Posición ligeramente elevada en mobile para liberar el centro-inferior
-  // y escala intermedia para mantener la presencia visual.
   const groupPosition = isMobile ? [0, 0.4, 0] : [1.2, 0, 0];
   const modelScale = isMobile ? 0.036 : 0.045; 
 
@@ -90,18 +88,19 @@ function ModelEye({ mode, isMobile }) {
           </Center>
         </group>
 
-        <ambientLight intensity={mode === 'xray' ? 1.8 : 2} />
-        <directionalLight position={[0, 5, 10]} intensity={3.8} color={currentColors.main} />
+        {/* Iluminación atenuada en modo xray para evitar quemar el contorno */}
+        <ambientLight intensity={mode === 'xray' ? 0.8 : 2} />
+        <directionalLight position={[0, 5, 10]} intensity={mode === 'xray' ? 2.2 : 3.8} color={currentColors.main} />
         
         <pointLight 
           ref={pointLightRef}
           position={[-3, 2, 3]} 
-          intensity={6} 
+          intensity={mode === 'xray' ? 3.5 : 6} 
           color={currentColors.accent} 
           distance={15}
         />
         
-        <pointLight position={[0, 0, 6]} intensity={mode === 'normal' ? 2 : 5} color={currentColors.main} />
+        <pointLight position={[0, 0, 6]} intensity={mode === 'normal' ? 2 : 3} color={currentColors.main} />
       </Float>
     </group>
   );
@@ -123,7 +122,7 @@ export default function EyeCanvas3D() {
   const galaxyConfig = {
     normal: { sparkleColor: '#00e5ff', count: 140, speed: 0.6 },
     cyber: { sparkleColor: '#ff00aa', count: 450, speed: 2.0 },
-    xray: { sparkleColor: '#00f5a0', count: 380, speed: 2.2 }
+    xray: { sparkleColor: '#00f5a0', count: 300, speed: 1.8 }
   };
 
   const activeGalaxy = galaxyConfig[visionMode];
@@ -137,8 +136,8 @@ export default function EyeCanvas3D() {
           50% { transform: scale(1.15) translate(-20px, 15px); opacity: 1; }
         }
         @keyframes emeraldGlass {
-          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.75; }
-          50% { transform: scale(1.1) rotate(8deg); opacity: 0.95; }
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+          50% { transform: scale(1.08) rotate(6deg); opacity: 0.75; }
         }
         .animate-cyber-glow {
           animation: pulseGlow 4s ease-in-out infinite;
@@ -155,7 +154,7 @@ export default function EyeCanvas3D() {
           alt="Galaxy Background" 
           className={`w-full h-full object-cover transition-all duration-700 ${
             visionMode === 'cyber' ? 'hue-rotate-[295deg] saturate-[250%] brightness-110 opacity-70' :
-            visionMode === 'xray' ? 'hue-rotate-[135deg] saturate-[180%] brightness-105 opacity-65' :
+            visionMode === 'xray' ? 'hue-rotate-[135deg] saturate-[140%] brightness-95 opacity-50' :
             'opacity-60 mix-blend-screen'
           }`}
         />
@@ -164,9 +163,10 @@ export default function EyeCanvas3D() {
           <div className="absolute top-1/2 right-[15%] -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-[radial-gradient(circle,_rgba(255,0,170,0.45)_0%,_rgba(168,85,247,0.3)_40%,_transparent_70%)] blur-[90px] animate-cyber-glow" />
         </div>
 
+        {/* Gradiente de fondo en modo Matrix atenuado para no saturar el borde posterior del 3D */}
         <div className={`absolute inset-0 transition-opacity duration-700 ${visionMode === 'xray' ? 'opacity-100' : 'opacity-0'}`}>
-          <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[680px] h-[680px] rounded-full bg-[radial-gradient(circle,_rgba(0,245,160,0.35)_0%,_rgba(0,184,148,0.2)_40%,_rgba(10,50,40,0.1)_70%,_transparent_100%)] blur-[80px] backdrop-blur-3xl animate-emerald-glass" />
-          <div className="absolute top-1/3 right-[18%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,_rgba(0,210,255,0.25)_0%,_transparent_65%)] blur-[60px]" />
+          <div className="absolute top-1/2 right-[10%] -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,_rgba(0,245,160,0.25)_0%,_rgba(0,184,148,0.12)_40%,_transparent_70%)] blur-[80px] backdrop-blur-3xl animate-emerald-glass" />
+          <div className="absolute top-1/3 right-[18%] w-[350px] h-[350px] rounded-full bg-[radial-gradient(circle,_rgba(0,210,255,0.18)_0%,_transparent_65%)] blur-[60px]" />
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/30 to-transparent z-1" />
@@ -200,7 +200,6 @@ export default function EyeCanvas3D() {
 
       {/* --- CANVAS 3D --- */}
       <div className="relative z-10 w-full h-full">
-        {/* AJUSTADO: Cámara z: 9.2 para recortar la distancia excesiva */}
         <Canvas camera={{ position: [0, 0, isMobile ? 9.2 : 8], fov: 45 }}>
           <Stars 
             radius={50} 
