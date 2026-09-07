@@ -7,3 +7,19 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
+
+/* 1. Elimina la barra horizontal visual en Chrome, Edge y Safari */
+::-webkit-scrollbar:horizontal {
+  display: none !important;
+  height: 0 !important;
+}
+
+/* 2. Mantiene la barra vertical completamente funcional y visible */
+::-webkit-scrollbar:vertical {
+  display: block;
+}
+
+/* 3. Asegura que en Firefox el desbordamiento horizontal no muestre barra */
+html, body {
+  overflow-x: hidden;
+}

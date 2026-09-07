@@ -22,6 +22,14 @@ const faqs = [
 export default function ExperienceFooter() {
   const [activeFaq, setActiveFaq] = useState(null);
 
+  // Scroll suave al inicio
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <footer className="w-full bg-[#030712] text-white pt-24 pb-12 border-t border-white/10 relative overflow-hidden">
       
@@ -82,7 +90,7 @@ export default function ExperienceFooter() {
           ))}
         </div>
 
-        {/* FOOTER BOTTOM & FIRMA TRADUCCIÓN CREATIVA */}
+        {/* FOOTER BOTTOM & FIRMA TRADUCCIÓN CREATIVA CON LINK CONECTADO */}
         <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row items-center justify-between font-mono text-xs text-neutral-500 gap-6">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
@@ -91,15 +99,31 @@ export default function ExperienceFooter() {
 
           <div className="flex items-center gap-2 text-neutral-400 font-semibold tracking-wider">
             <span>by</span>
-            <span className="text-cyan-400 font-bold uppercase tracking-widest hover:underline cursor-pointer">
+            <a 
+              href="https://traduccioncreativa.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 font-bold uppercase tracking-widest hover:underline hover:text-cyan-300 transition-colors"
+            >
               Traducción Creativa
-            </span>
+            </a>
           </div>
 
-          <div className="flex gap-8">
+          <div className="flex items-center gap-8">
             <a href="#" className="hover:text-white transition-colors">INSTAGRAM</a>
             <a href="#" className="hover:text-white transition-colors">LINKEDIN</a>
             <a href="#" className="hover:text-white transition-colors">TWITTER</a>
+
+            {/* BOTÓN VOLVER ARRIBA */}
+            <motion.button
+              onClick={scrollToTop}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-950/30 text-cyan-300 font-bold tracking-widest uppercase hover:bg-cyan-500/20 hover:border-cyan-400 transition-all cursor-pointer group shadow-[0_0_12px_rgba(34,211,238,0.15)]"
+            >
+              <span>ARRIBA</span>
+              <span className="group-hover:-translate-y-0.5 transition-transform">↑</span>
+            </motion.button>
           </div>
         </div>
 

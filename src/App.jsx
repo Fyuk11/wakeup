@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Lenis from 'lenis';
 
+import Preloader from './components/Preloader';
 import HeroVideo from './components/HeroVideo';
 import Hero3D from './components/Hero3D';
 import HorizontalGallery from './components/HorizontalGallery';
@@ -12,6 +13,8 @@ import ExperienceFooter from './components/ExperienceFooter';
 import eyeVideo from './assets/eye-video.mp4';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // 1. Desactivar el scroll guardado del navegador y forzar inicio arriba
     if ('scrollRestoration' in window.history) {
@@ -19,14 +22,21 @@ export default function App() {
     }
     window.scrollTo(0, 0);
 
-    // 2. Inicializar Lenis Smooth Scroll
+    // Si está cargando, bloqueamos el scroll
+    if (isLoading) {
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
+    document.body.style.overflow = 'unset';
+
+    // 2. Inicializar Lenis Smooth Scroll una vez que termina el loader
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
 
-    // Asegurar que Lenis también arranque arriba de todo
     lenis.scrollTo(0, { immediate: true });
 
     function raf(time) {
@@ -37,27 +47,30 @@ export default function App() {
     requestAnimationFrame(raf);
 
     return () => lenis.destroy();
-  }, []);
+  }, [isLoading]);
 
   return (
-    <div className="bg-black text-white selection:bg-cyan-500 selection:text-black">
+    <>
+      {/* Loader de Bienvenida Cinemático */}
+      <Preloader onComplete={() => setIsLoading(false)} />
 
-      {/* 1. Hero Cinemático con Video */}
-      <HeroVideo videoSrc={eyeVideo} />
+      <div className="bg-black text-white selection:bg-cyan-500 selection:text-black">
+        {/* 1. Hero Cinemático con Video */}
+        <HeroVideo videoSrc={eyeVideo} />
 
-      {/* 2. Laboratorio Ojo 3D */}
-      <Hero3D />
+        {/* 2. Laboratorio Ojo 3D */}
+        <Hero3D />
 
-      {/* 3. Galería Horizontal Interactiva GSAP */}
-      <HorizontalGallery />
+        {/* 3. Galería Horizontal Interactiva GSAP */}
+        <HorizontalGallery />
 
-      {/* Transición al Blanco + CTA */}
-      <LuminousTransition />
+        {/* Transición al Blanco + CTA */}
+        <LuminousTransition />
 
-      {/* Secciones con la estética real de tus fotos */}
-      <EyePortalSection />
-      <ExperienceFooter />
-
-    </div>
+        {/* Secciones con la estética real de tus fotos */}
+        <EyePortalSection />
+        <ExperienceFooter />
+      </div>
+    </>
   );
 }
